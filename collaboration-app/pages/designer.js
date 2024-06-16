@@ -1,21 +1,27 @@
 import { useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/router';
+import { useAuth } from '../context/AuthContext';
 
 export default function Designer() {
     const { user } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
-        if (!user || user.role !== 'designer') {
+        if (!user) {
             router.push('/signin');
+        } else if (user.role !== 'designer') {
+            router.push('/');
         }
-    }, [user]);
+    }, [user, router]);
 
-    return user && user.role === 'designer' ? (
+    if (!user || user.role !== 'designer') {
+        return <div>Loading...</div>;
+    }
+
+    return (
         <div>
-            <h1>Designer Dashboard</h1>
-            {/* Add designer-specific content here */}
+            <h1>Welcome, {user.name}</h1>
+            <p>This is the designer page.</p>
         </div>
-    ) : null;
+    );
 }

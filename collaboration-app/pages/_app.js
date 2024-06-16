@@ -1,15 +1,11 @@
-import { AuthProvider } from '../context/AuthContext';
 import '../styles/AuthForm.module.css';
 import '../public/styles.css';
+import { AuthProvider } from '../context/AuthContext';
 
-function MyApp({ Component, pageProps }) {
+export default function MyApp({ Component, pageProps }) {
     return (
         <AuthProvider>
             <Component {...pageProps} />
         </AuthProvider>
     );
 }
-
-
-
-export default MyApp;

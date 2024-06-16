@@ -1,21 +1,27 @@
 import { useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/router';
+import { useAuth } from '../context/AuthContext';
 
 export default function Admin() {
     const { user } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
-        if (!user || user.role !== 'admin') {
+        if (!user) {
             router.push('/signin');
+        } else if (user.role !== 'admin') {
+            router.push('/');
         }
-    }, [user]);
+    }, [user, router]);
 
-    return user && user.role === 'admin' ? (
+    if (!user || user.role !== 'admin') {
+        return <div>Loading...</div>;
+    }
+
+    return (
         <div>
-            <h1>Admin Dashboard</h1>
-            {/* Add admin-specific content here */}
+            <h1>Welcome, {user.name}</h1>
+            <p>This is the admin page.</p>
         </div>
-    ) : null;
+    );
 }

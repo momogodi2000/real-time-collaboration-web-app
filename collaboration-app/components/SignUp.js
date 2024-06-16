@@ -1,21 +1,21 @@
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import AuthContext from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 
 export default function SignUp() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
     const [role, setRole] = useState('developer');
-    const { register, error } = useContext(AuthContext);
+    const { register, error } = useAuth();
 
     const handleSignUp = async (e) => {
         e.preventDefault();
-        register(email, password, name, role);
+        await register(email, password, name, role);
     };
 
     return (
-        <div>
+        <div className="auth-container">
             <h2>Sign Up</h2>
             <form onSubmit={handleSignUp}>
                 <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
@@ -29,7 +29,7 @@ export default function SignUp() {
                 <button type="submit">Sign Up</button>
                 {error && <p style={{ color: 'red' }}>{error}</p>}
             </form>
-            <Link href="/signin">Already have an account? Sign In</Link>
+            <p>Already have an account? <Link href="/signin">Sign In</Link></p>
         </div>
     );
 }
