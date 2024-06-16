@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { useAuth } from '../context/AuthContext';
 
 export default function Developer() {
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
@@ -22,6 +22,7 @@ export default function Developer() {
         <div>
             <h1>Welcome, {user.name}</h1>
             <p>This is the developer page.</p>
+            <button onClick={logout}>Logout</button>
         </div>
     );
 }

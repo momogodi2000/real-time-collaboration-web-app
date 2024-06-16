@@ -33,12 +33,16 @@ export const AuthProvider = ({ children }) => {
 
     const logout = async () => {
         try {
-            await axios.post('http://localhost:8000/api/logout');
+            await axios.post('http://localhost:8000/api/logout', null, {
+                headers: {
+                    Authorization: `Bearer ${user.token}`,
+                },
+            });
             setUser(null);
-            setError(null);
+            localStorage.removeItem('user');
             router.push('/signin');
         } catch (err) {
-            setError(err.response.data.message || 'Logout failed');
+            console.error('Logout failed:', err);
         }
     };
 
