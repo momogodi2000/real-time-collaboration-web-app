@@ -8,7 +8,8 @@ use App\Http\Controllers\AnalyticsController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout']);
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+
 
 Route::post('/ai/suggestions', [AIController::class, 'getSuggestions'])->middleware('auth:sanctum');
 

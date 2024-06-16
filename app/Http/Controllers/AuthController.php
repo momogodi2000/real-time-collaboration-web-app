@@ -3,25 +3,25 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        $validatedData = $request->validate([
+        $request->validate([
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:6',
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-            'role' => 'required|string',
+            'role' => 'required|in:developer,designer,manager',
         ]);
 
         $user = User::create([
-            'name' => $validatedData['name'],
-            'email' => $validatedData['email'],
-            'password' => Hash::make($validatedData['password']),
-            'role' => $validatedData['role'],
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'name' => $request->name,
+            'role' => $request->role,
         ]);
 
         return response()->json(['user' => $user], 201);
@@ -29,24 +29,19 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
+        $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            return response()->json(['user' => Auth::user()]);
+            $user = Auth::user();
+            return response()->json(['user' => $user], 200);
+        } else {
+            return response()->json(['message' => 'Invalid credentials'], 401);
         }
-
-        return response()->json(['message' => 'Invalid credentials'], 401);
     }
 
     public function logout(Request $request)
     {
         Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        return response()->json(['message' => 'Logged out successfully']);
+        return response()->json(['message' => 'Logged out successfully'], 200);
     }
 }

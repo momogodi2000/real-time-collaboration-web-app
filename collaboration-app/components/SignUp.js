@@ -1,63 +1,35 @@
-import { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
-import styles from './AuthForm.module.css';
+import { useState, useContext } from 'react';
+import Link from 'next/link';
+import AuthContext from '../context/AuthContext';
 
-export default function SignUp({ onSwitchToSignIn }) {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [role, setRole] = useState('developer');
-  const { signup, error } = useAuth();
+export default function SignUp() {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
+    const [role, setRole] = useState('developer');
+    const { register, error } = useContext(AuthContext);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    await signup(name, role, email, password);
-  };
+    const handleSignUp = async (e) => {
+        e.preventDefault();
+        register(email, password, name, role);
+    };
 
-  return (
-    <div className={styles.container}>
-      <form onSubmit={handleSubmit} className={styles.form}>
-        <h2>Sign Up</h2>
-        {error && <p className={styles.error}>{error}</p>}
-        <input
-          type="text"
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className={styles.input}
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className={styles.input}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className={styles.input}
-        />
-        <select
-          value={role}
-          onChange={(e) => setRole(e.target.value)}
-          className={styles.select}
-        >
-          <option value="developer">Developer</option>
-          <option value="designer">Designer</option>
-          <option value="manager">Manager</option>
-          <option value="admin">Admin</option>
-        </select>
-        <button type="submit" className={styles.button}>
-          Sign Up
-        </button>
-        <br></br>
-        <button onClick={onSwitchToSignIn} className={styles.button}>
-          Already have an Account? Sign In
-        </button>
-      </form>
-    </div>
-  );
+    return (
+        <div>
+            <h2>Sign Up</h2>
+            <form onSubmit={handleSignUp}>
+                <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} required />
+                <select value={role} onChange={(e) => setRole(e.target.value)}>
+                    <option value="developer">Developer</option>
+                    <option value="designer">Designer</option>
+                    <option value="manager">Project Manager</option>
+                </select>
+                <button type="submit">Sign Up</button>
+                {error && <p style={{ color: 'red' }}>{error}</p>}
+            </form>
+            <Link href="/signin">Already have an account? Sign In</Link>
+        </div>
+    );
 }

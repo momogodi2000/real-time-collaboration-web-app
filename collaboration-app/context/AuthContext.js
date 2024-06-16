@@ -1,75 +1,66 @@
-import { createContext, useContext, useState } from 'react';
+import React, { createContext, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 
 const AuthContext = createContext();
 
-export function AuthProvider({ children }) {
+export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [error, setError] = useState(null);
     const router = useRouter();
 
-    const signin = async (email, password) => {
+    const register = async (email, password, name, role) => {
+        try {
+            const response = await axios.post('http://localhost:8000/api/register', { email, password, name, role });
+            setUser(response.data.user);
+            router.push('/signin');
+        } catch (err) {
+            if (err.response && err.response.data) {
+                setError(err.response.data.message || 'Registration failed');
+            } else {
+                setError('An unexpected error occurred during registration');
+            }
+            console.error('Error during registration:', err);
+        }
+    };
+
+    const login = async (email, password) => {
         try {
             const response = await axios.post('http://localhost:8000/api/login', { email, password });
             setUser(response.data.user);
-            setError(null);
-
-            // Redirect based on role
-            if (response.data.user.role === 'developer') {
+            const role = response.data.user.role;
+            if (role === 'developer') {
                 router.push('/developer');
-            } else if (response.data.user.role === 'designer') {
+            } else if (role === 'designer') {
                 router.push('/designer');
-            } else if (response.data.user.role === 'manager') {
+            } else if (role === 'manager') {
                 router.push('/manager');
-            } else if (response.data.user.role === 'admin') {
-                router.push('/admin');
             }
         } catch (err) {
-            setError(err.response.data.message || 'Login failed');
+            if (err.response && err.response.data) {
+                setError(err.response.data.message || 'Login failed');
+            } else {
+                setError('An unexpected error occurred during login');
+            }
+            console.error('Error during login:', err);
         }
     };
 
-    const signup = async (name, role, email, password) => {
-        try {
-            const response = await axios.post('http://localhost:8000/api/register', {
-                name, role, email, password
-            });
-            setUser(response.data.user);
-            setError(null);
-
-            // Redirect based on role
-            if (response.data.user.role === 'developer') {
-                router.push('/developer');
-            } else if (response.data.user.role === 'designer') {
-                router.push('/designer');
-            } else if (response.data.user.role === 'manager') {
-                router.push('/manager');
-            } else if (response.data.user.role === 'admin') {
-                router.push('/admin');
-            }
-        } catch (err) {
-            setError(err.response.data.message || 'Registration failed');
-        }
-    };
-
-    const signout = async () => {
+    const logout = async () => {
         try {
             await axios.post('http://localhost:8000/api/logout');
             setUser(null);
             router.push('/signin');
         } catch (err) {
-            setError('Logout failed');
+            console.error('Error during logout:', err);
         }
     };
 
     return (
-        <AuthContext.Provider value={{ user, error, signin, signup, signout }}>
+        <AuthContext.Provider value={{ user, error, register, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
-}
+};
 
-export function useAuth() {
-    return useContext(AuthContext);
-}
+export default AuthContext;

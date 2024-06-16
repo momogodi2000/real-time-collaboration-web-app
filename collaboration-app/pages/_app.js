@@ -1,7 +1,6 @@
 import { AuthProvider } from '../context/AuthContext';
-
-
 import '../styles/AuthForm.module.css';
+import '../public/styles.css';
 
 function MyApp({ Component, pageProps }) {
     return (
